@@ -1,11 +1,14 @@
 import "../styles/globals.css";
+import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "@material-tailwind/react";
 
-function MyApp({ Component, pageProps }) {
+function MyApp({ Component, session, pageProps }) {
   return (
-    <ThemeProvider>
-      <Component {...pageProps} />
-    </ThemeProvider>
+    <SessionProvider session={session}>
+      <ThemeProvider>
+        <Component {...pageProps} />
+      </ThemeProvider>
+    </SessionProvider>
   );
 }
 
