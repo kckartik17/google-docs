@@ -15,20 +15,48 @@ import FolderIcon from "../components/svgs/folder.svg";
 import { getSession, useSession } from "next-auth/react";
 import Login from "../components/Login";
 import { Fragment, useState } from "react";
+import { db } from "../firebase";
+import {
+  collection,
+  doc,
+  setDoc,
+  addDoc,
+  serverTimestamp,
+  query,
+  orderBy,
+} from "firebase/firestore";
+import {
+  useCollection,
+  useCollectionOnce,
+} from "react-firebase-hooks/firestore";
+import DocumentRow from "../components/DocumentRow";
 
 export default function Home() {
   const { data: session } = useSession();
   if (!session) return <Login />;
-
+  const docRef = collection(db, "userDocs", session.user.email, "docs");
   const [open, setOpen] = useState(false);
-
   const handleOpen = (value) => {
     setOpen(!open);
     setInputValue("");
   };
   const [inputValue, setInputValue] = useState("");
+  const [snapshot, loading] = useCollection(
+    query(
+      collection(db, "userDocs", session.user.email, "docs"),
+      orderBy("timestamp")
+    )
+  );
 
-  const createDocument = () => {};
+  const createDocument = async () => {
+    if (!inputValue) return;
+    await addDoc(docRef, {
+      fileName: inputValue,
+      timestamp: serverTimestamp(),
+    });
+
+    handleOpen();
+  };
 
   return (
     <div>
@@ -97,6 +125,16 @@ export default function Home() {
             <p className="mr-12">Date Created</p>
             <FolderIcon className="text-xl text-grey-600" />
           </div>
+          {loading && <div>Loading....</div>}
+          {!loading &&
+            snapshot.docs.map((doc) => (
+              <DocumentRow
+                key={doc.id}
+                id={doc.id}
+                fileName={doc.data().fileName}
+                date={doc.data().timestamp}
+              />
+            ))}
         </div>
       </section>
     </div>
