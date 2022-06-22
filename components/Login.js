@@ -8,7 +8,7 @@ function Login() {
       <DocsIcon className="text-9xl" />
       <button
         className="px-6 py-3 mt-4 font-semibold text-gray-900 bg-white border-2 border-gray-500 rounded-md shadow outline-none hover:bg-blue-50 hover:border-blue-400 focus:outline-none"
-        onClick={signIn}>
+        onClick={() => signIn("google")}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="inline w-4 h-4 mr-3 text-gray-900 fill-current"

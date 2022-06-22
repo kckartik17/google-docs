@@ -4,7 +4,7 @@ import DocsIcon from "./svgs/google-docs-icon.svg";
 import MenuIcon from "./svgs/menu.svg";
 import SearchIcon from "./svgs/search.svg";
 import AppDrawer from "./svgs/app-drawer.svg";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 
 export default function Header() {
   const { data: session } = useSession();
@@ -37,6 +37,7 @@ export default function Header() {
         <AppDrawer className="text-2xl text-grey-600" />
       </Button>
       <img
+        onClick={signOut}
         className="hidden md:inline-flex cursor-pointer h-12 w-12 rounded-full ml-2"
         loading="lazy"
         alt="picture"

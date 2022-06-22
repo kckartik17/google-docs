@@ -1,15 +1,35 @@
-import { IconButton } from "@material-tailwind/react";
+import {
+  IconButton,
+  Button,
+  Dialog,
+  DialogHeader,
+  DialogBody,
+  DialogFooter,
+  Input,
+} from "@material-tailwind/react";
 import Head from "next/head";
 import Image from "next/image";
 import Header from "../components/Header";
 import DotsIcon from "../components/svgs/dots.svg";
 import FolderIcon from "../components/svgs/folder.svg";
-import { useSession } from "next-auth/react";
+import { getSession, useSession } from "next-auth/react";
 import Login from "../components/Login";
+import { Fragment, useState } from "react";
 
 export default function Home() {
   const { data: session } = useSession();
   if (!session) return <Login />;
+
+  const [open, setOpen] = useState(false);
+
+  const handleOpen = (value) => {
+    setOpen(!open);
+    setInputValue("");
+  };
+  const [inputValue, setInputValue] = useState("");
+
+  const createDocument = () => {};
+
   return (
     <div>
       <Head>
@@ -29,11 +49,41 @@ export default function Home() {
             </IconButton>
           </div>
           <div>
-            <div className="relative h-52 w-40 border-2 cursor-pointer border-transparent hover:border-blue-700">
-              <Image
-                src="https://ssl.gstatic.com/docs/templates/thumbnails/docs-blank-googlecolors.png"
-                layout="fill"></Image>
-            </div>
+            <Fragment>
+              <div
+                onClick={handleOpen}
+                className="relative h-52 w-40 border-2 cursor-pointer border-transparent hover:border-blue-700">
+                <Image
+                  src="https://ssl.gstatic.com/docs/templates/thumbnails/docs-blank-googlecolors.png"
+                  layout="fill"></Image>
+              </div>
+              <Dialog open={open} handler={handleOpen}>
+                <DialogHeader>Create a new document</DialogHeader>
+                <DialogBody>
+                  <Input
+                    label="Name"
+                    onKeyDown={(e) => e.key === "Enter" && createDocument()}
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                  />
+                </DialogBody>
+                <DialogFooter>
+                  <Button
+                    variant="text"
+                    color="red"
+                    onClick={handleOpen}
+                    className="mr-1">
+                    <span>Cancel</span>
+                  </Button>
+                  <Button
+                    variant="gradient"
+                    color="blue"
+                    onClick={createDocument}>
+                    <span>Create</span>
+                  </Button>
+                </DialogFooter>
+              </Dialog>
+            </Fragment>
             <p className="ml-2 mt-2 font-semibold text-sm text-grey-700">
               Blank
             </p>
@@ -51,4 +101,12 @@ export default function Home() {
       </section>
     </div>
   );
+}
+
+export async function getServerSideProps(context) {
+  return {
+    props: {
+      session: await getSession(context),
+    },
+  };
 }
